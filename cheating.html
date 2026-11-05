@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="default">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NoHardX OS 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- SYSTEM THEME TOKENS --- */
+        :root {
+            --menubar-height: 48px;
+            --nav-height: 75px;
+            
+            /* Default Theme (Dark Premium) */
+            --bg-image: url('https://res.cloudinary.com/wkecyjsn/image/upload/ar_1:1,b_gen_fill,c_pad/e_enhance/r_20/f_auto/q_auto/4538d8e6c37325b4e7b5429bda0e8bc6.jpg');
+            --overlay: rgba(10, 5, 20, 0.6); /* Lighter overlay to keep background sharp */
+            --glass-bg: rgba(30, 20, 50, 0.65);
+            --glass-border: rgba(150, 100, 255, 0.25);
+            --text-main: #FFFFFF;
+            --text-dim: #A090C0;
+            --accent: #7B61FF;
+            --accent-glow: rgba(123, 97, 255, 0.5);
+            --success: #00FF88;
+            --danger: #FF3366;
+            --card-bg: rgba(20, 15, 35, 0.85);
+            --nav-bg: rgba(25, 15, 45, 0.85);
+        }
+
+        /* Premium Theme */
+        [data-theme="premium"] {
+            --overlay: rgba(20, 15, 5, 0.7);
+            --glass-bg: rgba(35, 30, 20, 0.65);
+            --glass-border: rgba(212, 175, 55, 0.3);
+            --text-main: #FFF8E7;
+            --text-dim: #C0B090;
+            --accent: #FFD700;
+            --accent-glow: rgba(255, 215, 0, 0.5);
+            --card-bg: rgba(25, 20, 10, 0.85);
+            --nav-bg: rgba(30, 25, 15, 0.85);
+        }
+
+        /* Halloween Theme */
+        [data-theme="halloween"] {
+            --overlay: rgba(15, 5, 0, 0.75);
+            --glass-bg: rgba(40, 15, 10, 0.65);
+            --glass-border: rgba(255, 100, 0, 0.3);
+            --text-main: #FFDAB9;
+            --text-dim: #CD853F;
+            --accent: #FF5500;
+            --accent-glow: rgba(255, 85, 0, 0.5);
+            --success: #32CD32;
+            --card-bg: rgba(25, 5, 5, 0.85);
+            --nav-bg: rgba(35, 10, 5, 0.85);
+        }
+
+        /* Christmas Theme */
+        [data-theme="christmas"] {
+            --overlay: rgba(0, 15, 5, 0.75);
+            --glass-bg: rgba(10, 30, 20, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-main: #FFFFFF;
+            --text-dim: #A0C0B0;
+            --accent: #FF0000;
+            --accent-glow: rgba(255, 0, 0, 0.5);
+            --success: #00FF7F;
+            --card-bg: rgba(5, 25, 15, 0.85);
+            --nav-bg: rgba(10, 35, 25, 0.85);
+        }
+
+        /* Easter Theme */
+        [data-theme="easter"] {
+            --overlay: rgba(255, 240, 245, 0.5);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 182, 193, 0.4);
+            --text-main: #4A4A4A;
+            --text-dim: #8B7D7B;
+            --accent: #FF69B4;
+            --accent-glow: rgba(255, 105, 180, 0.4);
+            --danger: #FF6347;
+            --card-bg: rgba(255, 250, 250, 0.9);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        body {
+            background-color: #000;
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            overflow: hidden; 
+            user-select: none;
+            -webkit-font-smoothing: antialiased;
+            height: 100dvh; width: 100vw;
+            transition: color 0.3s;
+        }
+
+        /* 1. FIX BACKGROUND: Sharp image, no global blur */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: var(--bg-image);
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            z-index: -2;
+        }
+
+        /* Overlay only, NO backdrop-filter on body */
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background: var(--overlay);
+            z-index: -1;
+            transition: background 0.5s;
+        }
+
+        /* Glass Utilities for Cards */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        /* --- INTRO SCREEN --- */
+        #intro-screen {
+            position: fixed; inset: 0; z-index: 999999;
+            background: #000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
+        }
+        #intro-screen.hidden-intro { opacity: 0; visibility: hidden; }
+        .intro-logo {
+            width: 120px; height: 120px;
+            animation: scaleFadeIn 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards, float 3s ease-in-out infinite 1.5s;
+            filter: drop-shadow(0 0 20px var(--accent-glow));
+            opacity: 0; transform: scale(0.5);
+        }
+        .intro-text {
+            margin-top: 20px; font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 4px;
+            animation: fadeIn 1s ease-out 1s forwards; opacity: 0;
+        }
+        .intro-progress {
+            width: 150px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 30px;
+            overflow: hidden; animation: fadeIn 0.5s ease-out 1.5s forwards; opacity: 0;
+        }
+        .intro-progress-bar {
+            width: 0%; height: 100%; background: var(--accent); border-radius: 3px;
+            animation: loadProgress 2s cubic-bezier(0.25, 1, 0.5, 1) 1.8s forwards;
+        }
+        @keyframes scaleFadeIn { to { opacity: 1; transform: scale(1); } }
+        @keyframes loadProgress { to { width: 100%; } }
+        @keyframes fadeIn { to { opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* --- LOGIN SCREEN --- */
+        #login-screen {
+            position: fixed; inset: 0; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.4s, transform 0.4s;
+        }
+        #login-screen.hidden-lock { display: none !important; }
+
+        .rainbow-text {
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 2rem;
+            background: linear-gradient(90deg, #FF453A, #FF9F0A, #FFD60A, #30D158, #0A84FF, #5E5CE6, #BF5AF2, #FF453A);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: rainbow 3s linear infinite; display: inline-block; text-align: center;
+        }
+        @keyframes rainbow { to { background-position: 200% center; } }
+
+        /* --- OS SHELL --- */
+        #os-shell {
+            display: flex; flex-direction: column; height: 100dvh; width: 100vw;
+            position: relative; overflow: hidden; opacity: 0; transition: opacity 0.5s;
+        }
+        #os-shell.active-os { opacity: 1; }
+
+        /* --- 3. FIX STATUS BAR: Removed Fake Status Bar, only keeping Dynamic Island --- */
+        #dynamic-island-wrapper {
+            position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
+            z-index: 9999; display: flex; justify-content: center; width: 100%; pointer-events: none;
+        }
+        #dynamic-island {
+            background: #000; border-radius: 30px; display: flex; align-items: center; justify-content: space-between;
+            overflow: hidden; pointer-events: auto; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15); transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            width: 200px; height: 34px; padding: 0 12px; position: relative;
+        }
+        #dynamic-island.expanded { width: 90%; max-width: 360px; height: auto; min-height: 70px; border-radius: 24px; padding: 16px; align-items: flex-start; background: #050505; }
+        #dynamic-island.idle { width: 130px; height: 34px; } /* Idle state */
+        
+        .island-idle-content { display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; font-weight: 600; opacity: 1; transition: opacity 0.2s; white-space: nowrap; width: 100%; justify-content: space-between;}
+        #dynamic-island.expanded .island-idle-content { display: none; }
+        
+        .island-content-full { display: none; width: 100%; color: #fff; animation: fadeIn 0.3s forwards; opacity: 0; }
+        #dynamic-island.expanded .island-content-full { display: flex; flex-direction: column; gap: 8px; }
+        
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-success { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .dot-error { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+        .dot-processing { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+        /* Sound visualizer bars */
+        .sound-wave { display: flex; gap: 2px; align-items: flex-end; height: 12px; }
+        .sound-wave span { width: 2px; background: var(--accent); border-radius: 1px; animation: wave 1s infinite alternate; }
+        .sound-wave span:nth-child(2) { animation-delay: 0.2s; }
+        .sound-wave span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes wave { 0% { height: 4px; } 100% { height: 12px; } }
+
+        /* --- MAIN HEADER --- */
+        #main-header {
+            padding: 20px 20px 10px 20px; /* Adjusted top padding since status bar is gone */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            margin-top: 30px; /* Space for Dynamic Island */
+        }
+        
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-box {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: linear-gradient(135deg, rgba(123,97,255,0.2), rgba(0,240,255,0.2));
+            border: 1px solid rgba(123,97,255,0.5);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 15px rgba(123,97,255,0.3);
+        }
+        .logo-box svg { width: 28px; height: 28px; filter: drop-shadow(0 0 5px #fff); }
+        .header-title { font-size: 20px; font-weight: 700; font-family: 'Orbitron', sans-serif; line-height: 1.1; }
+        .header-subtitle { font-size: 12px; color: var(--text-dim); }
+        
+        .header-actions { display: flex; gap: 10px; }
+        .icon-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: center; align-items: center;
+            color: var(--text-main); transition: all 0.2s; cursor: pointer;
+        }
+        .icon-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
+
+        /* --- MAIN CONTENT --- */
+        #main-content {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding: 0 16px 20px 16px;
+            display: flex; flex-direction: column; gap: 16px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        #main-content::-webkit-scrollbar { display: none; }
+
+        .tab-pane { display: none; animation: slideUp 0.3s ease-out forwards; flex-direction: column; gap: 16px;}
+        .tab-pane.active { display: flex; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 4. REORGANIZED CARDS --- */
+        .neon-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            padding: 16px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.8), inset 0 0 20px rgba(123,97,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .inner-box {
+            background: var(--card-bg);
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px;
+            margin-top: 12px;
+        }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+        }
+        .card-title-group { display: flex; align-items: center; gap: 12px; }
+        .card-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(123,97,255,0.15);
+            color: var(--accent);
+        }
+        .card-title { font-size: 16px; font-weight: 700; }
+        .card-desc { font-size: 12px; color: var(--text-dim); }
+        
+        .status-pill {
+            font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .status-pill.online { color: var(--success); background: rgba(0,255,136,0.1); }
+        .status-pill.risk { color: var(--danger); background: rgba(255,51,102,0.1); }
+        .status-pill.locked { color: var(--success); background: rgba(0,255,136,0.1); }
+
+        /* --- CONNECTION MANAGER --- */
+        .conn-toggle-row {
+            display: flex; justify-content: space-between; align-items: center; padding: 4px 0;
+        }
+        .conn-status-text { font-size: 16px; font-weight: 800; color: var(--accent); letter-spacing: 1px; font-family: 'Orbitron', sans-serif;}
+        
+        /* iOS Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 34px; border: 1px solid rgba(255,255,255,0.1); }
+        .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        input:checked + .slider { background-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* --- FEATURES GRID --- */
+        .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+        .feat-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main); font-size: 12px; font-weight: 600;
+            padding: 10px 0; border-radius: 10px; text-align: center;
+            transition: all 0.2s; cursor: pointer;
+        }
+        .feat-btn.active {
+            background: var(--accent); color: #fff; border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .feat-btn:active { transform: scale(0.95); }
+
+        /* --- SLIDER --- */
+        .custom-slider {
+            -webkit-appearance: none; width: 100%; height: 6px;
+            background: rgba(255,255,255,0.1); border-radius: 3px; outline: none; margin: 15px 0;
+        }
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 20px; height: 20px;
+            border-radius: 50%; background: #fff; cursor: pointer;
+            box-shadow: 0 0 10px var(--accent);
+        }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-top: -5px; margin-bottom: 10px;}
+
+        /* --- ACCOUNT & SYSTEM --- */
+        .sys-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+        .sys-icon { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--accent);}
+        .sys-info { flex: 1; margin-left: 12px; }
+        .sys-title { font-size: 12px; color: var(--text-dim); }
+        .sys-value { font-size: 14px; font-weight: 700; color: var(--text-main); font-family: 'Orbitron', sans-serif;}
+        
+        /* Console Log */
+        .console-box {
+            background: #000; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; padding: 10px; height: 80px; overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--success);
+        }
+
+        /* --- BOTTOM NAVIGATION --- */
+        #bottom-nav-container {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            z-index: 9999; display: flex; flex-direction: column; align-items: center;
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
+            will-change: transform;
+        }
+
+        #bottom-nav-container.hidden-nav {
+            transform: translateY(120%);
+            opacity: 0;
+        }
+
+        #nav-trigger {
+            width: 100px; height: 20px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 8px;
+            cursor: grab; z-index: 10000;
+        }
+        #nav-pill {
+            width: 40px; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.3);
+            transition: background 0.2s;
+        }
+
+        .bottom-nav {
+            width: 90%; max-width: 380px; height: 70px;
+            background: var(--nav-bg); backdrop-filter: blur(24px);
+            border-radius: 24px; border: 1px solid var(--glass-border);
+            display: flex; justify-content: space-around; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 60px; height: 100%; color: var(--text-dim); cursor: pointer; transition: all 0.3s;
+            position: relative;
+        }
+        .nav-item.active { color: var(--accent); }
+        .nav-item.active svg { filter: drop-shadow(0 0 8px var(--accent-glow)); }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; transition: transform 0.3s;}
+        .nav-item.active svg { transform: translateY(-2px); }
+        .nav-label { font-size: 10px; font-weight: 600; font-family: 'Orbitron', sans-serif; }
+
+        /* --- UTILITIES --- */
+        .hidden { display: none !important; }
+        
+        /* Custom Scrollbar for desktop */
+        @media (min-width: 768px) {
+            #os-shell { max-width: 420px; margin: 0 auto; border-left: 1px solid #333; border-right: 1px solid #333; }
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden">
+
+    <audio id="bg-music" loop>
+        <source src="https://www.image2url.com/r2/default/audio/1793877981715-f6eb9095-5e37-4366-ac8f-30ea284bda4c.m4a" type="audio/mp4">
+    </audio>
+
+    <!-- INTRO SCREEN -->
+    <div id="intro-screen">
+        <svg class="intro-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 5L10 25V50C10 72.5 26.5 90 50 95C73.5 90 90 72.5 90 50V25L50 5Z" fill="url(#paint0_linear)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <path d="M50 25L30 35V50C30 62 38 72 50 76C62 72 70 62 70 50V35L50 25Z" fill="#000"/>
+            <circle cx="50" cy="45" r="6" fill="#FFFFFF"/>
+            <path d="M40 58L50 52L60 58" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="paint0_linear" x1="10" y1="5" x2="90" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#7B61FF"/><stop offset="1" stop-color="#00F0FF"/></linearGradient></defs>
+        </svg>
+        <div class="intro-text font-orbitron">NoHardX OS</div>
+        <div class="intro-progress"><div class="intro-progress-bar"></div></div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="hidden-intro">
+        <div class="custom-logo mb-6">
+            <svg width="90" height="90" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 5L10 25V50C10 72.5 26.5 90 50 95C73.5 90 90 72.5 90 50V25L50 5Z" fill="url(#paint0_linear)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+                <path d="M50 25L30 35V50C30 62 38 72 50 76C62 72 70 62 70 50V35L50 25Z" fill="#000"/>
+                <circle cx="50" cy="45" r="6" fill="#FFFFFF"/>
+                <path d="M40 58L50 52L60 58" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs><linearGradient id="paint0_linear" x1="10" y1="5" x2="90" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#7B61FF"/><stop offset="1" stop-color="#00F0FF"/></linearGradient></defs>
+            </svg>
+        </div>
+
+        <div class="mb-6 w-full max-w-sm overflow-hidden flex justify-center">
+            <div class="rainbow-text">NOHARDX OS</div>
+        </div>
+        
+        <div class="w-[90%] max-w-sm glass rounded-3xl p-6 relative">
+            <div class="text-center mb-6">
+                <p class="text-[13px] font-medium text-[var(--text-dim)] tracking-wide leading-relaxed" data-i18n="login_subtitle">
+                    KHÔNG CẦN TÀI KHOẢN.<br>CHỈ CẦN CHÌA KHÓA CỦA BẠN.
+                </p>
+            </div>
+
+            <div class="mb-4">
+                <label class="text-[11px] text-[var(--text-dim)] font-semibold mb-2 flex items-center tracking-widest font-orbitron"><span class="text-[var(--accent)] mr-2 text-[8px]">■</span> <span data-i18n="access_key">KHÓA TRUY CẬP</span></label>
+                <div class="relative flex items-center">
+                    <input type="text" id="login-key-input" placeholder="HARDX-XXXX-XXXX-XXXX" 
+                        class="w-full bg-black/40 border border-white/10 text-white px-4 py-3.5 rounded-xl text-sm focus:outline-none focus:border-[var(--accent)] tracking-widest font-orbitron transition-all">
+                    <button onclick="pasteKey()" class="absolute right-2 bg-white/10 hover:bg-white/20 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition active:scale-95" data-i18n="paste">DÁN</button>
+                </div>
+                <p id="login-error" class="text-red-500 text-[11px] mt-2 hidden font-semibold tracking-wider animate-pulse" data-i18n="login_error">MÃ KHÓA KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN</p>
+            </div>
+
+            <div class="group relative">
+                <div class="absolute -inset-1 bg-gradient-to-r from-[var(--accent)] via-purple-500 to-[var(--accent)] rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500 will-change-transform"></div>
+                <button onclick="handleLogin()" class="relative flex items-center justify-center gap-3 px-8 py-4 bg-[var(--text-main)] text-black font-bold rounded-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] w-full overflow-hidden shadow-lg">
+                    <span class="text-[15px] font-semibold tracking-wide" data-i18n="login_btn">ĐĂNG NHẬP OS</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OS SHELL -->
+    <div id="os-shell" class="hidden">
+        
+        <!-- 3. FIX STATUS BAR: Removed fake status bar, Dynamic Island stays absolute -->
+        
+        <!-- DYNAMIC ISLAND -->
+        <div id="dynamic-island-wrapper">
+            <div id="dynamic-island" class="idle" onclick="toggleIslandExpand()">
+                <!-- Idle View -->
+                <div class="island-idle-content">
+                    <div class="flex items-center gap-2">
+                        <!-- 2. FIX LOGO: Use SVG instead of broken image -->
+                        <div class="w-6 h-6 rounded-full bg-black flex items-center justify-center border border-gray-600">
+                            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4">
+                                <path d="M50 5L10 25V50C10 72.5 26.5 90 50 95C73.5 90 90 72.5 90 50V25L50 5Z" fill="var(--accent)"/>
+                                <path d="M50 25L30 35V50C30 62 38 72 50 76C62 72 70 62 70 50V35L50 25Z" fill="#000"/>
+                            </svg>
+                        </div>
+                        <span class="text-[11px] font-orbitron">NoHardX OS</span>
+                    </div>
+                    <div class="sound-wave">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+                
+                <!-- Expanded View -->
+                <div class="island-content-full">
+                    <div class="flex items-center justify-between w-full mb-1">
+                        <div class="flex items-center gap-2">
+                            <div id="island-icon-full" class="status-dot dot-processing"></div>
+                            <span id="island-title" class="font-bold text-sm">Notification</span>
+                        </div>
+                        <span class="text-[9px] text-gray-400 font-orbitron">NoHardX OS</span>
+                    </div>
+                    <p id="island-message" class="text-xs text-gray-300 leading-snug">Message...</p>
+                    <div class="w-full bg-white/10 h-1 rounded-full mt-2 overflow-hidden hidden" id="island-progress-container">
+                        <div id="island-progress-bar" class="h-full bg-[var(--accent)] w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN HEADER -->
+        <header id="main-header">
+            <div class="logo-area">
+                <div class="logo-box">
+                    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 5L10 25V50C10 72.5 26.5 90 50 95C73.5 90 90 72.5 90 50V25L50 5Z" fill="rgba(255,255,255,0.1)" stroke="#fff" stroke-width="2"/>
+                        <text x="50" y="65" font-family="Orbitron" font-size="40" font-weight="900" fill="#fff" text-anchor="middle">N</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="header-title">NoHardX OS 2.0</h1>
+                    <p class="header-subtitle">Next-Gen Web OS</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="notifyOS('info', 'Search', 'Search functionality coming soon', 'info')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+                <button class="icon-btn" onclick="notifyOS('info', 'Notifications', 'No new notifications', 'info')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                </button>
+                <button class="icon-btn" onclick="switchTab('settings')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main id="main-content">
+            
+            <!-- TAB: HOME -->
+            <div id="tab-home" class="tab-pane active">
+                
+                <!-- Connection Manager Card -->
+                <div class="neon-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-icon !bg-[rgba(0,240,255,0.15)] !text-[#00F0FF]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="card-title" data-i18n="app_home">Connection Manager</h2>
+                                <p class="card-desc">Manage your connection</p>
+                            </div>
+                        </div>
+                        <div id="conn-status-badge" class="status-pill online">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span id="conn-status-text" data-i18n="status_offline">Offline</span>
+                        </div>
+                    </div>
+                    
+                    <div class="inner-box conn-toggle-row">
+                        <div class="flex items-center gap-3">
+                            <div id="status-indicator" class="w-3 h-3 bg-gray-500 rounded-full transition-colors duration-300 shadow-[0_0_10px_#555]"></div>
+                            <div class="flex flex-col">
+                                <span id="status-text" class="conn-status-text !text-gray-400" data-i18n="status_offline">NGOẠI TUYẾN</span>
+                                <span id="conn-timer" class="text-[11px] text-[var(--accent)] font-mono hidden font-bold mt-0.5"></span>
+                                <span id="status-ip" class="text-[10px] text-[var(--accent)] font-mono hidden font-bold"></span>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="connection-toggle" onchange="toggleConnection(this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Server List (Hidden by default) -->
+                    <div id="server-panel" class="hidden mt-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="text-[11px] text-[var(--text-dim)] font-bold tracking-widest font-orbitron" data-i18n="server_list">DANH SÁCH MÁY CHỦ</div>
+                            <div id="conn-loading" class="hidden"><div class="w-4 h-4 border-2 border-[var(--accent)] border-t-transparent rounded-full animate-spin"></div></div>
+                        </div>
+                        <div class="server-list space-y-2 max-h-48 overflow-y-auto pr-1">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overview Info Card -->
+                <div class="neon-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-icon !bg-[rgba(0,255,136,0.15)] !text-[#00FF88]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="card-title">System Overview</h2>
+                                <p class="card-desc">Account status & Key info</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mt-2">
+                        <div class="inner-box">
+                            <div class="text-[10px] text-[var(--text-dim)] font-semibold uppercase tracking-wider mb-1" data-i18n="access_key">CHÌA KHÓA</div>
+                            <div id="home-key-display" class="font-orbitron font-bold text-[13px] text-[var(--text-main)] truncate">HARDX-XXXX...</div>
+                            <button onclick="copyKey()" class="text-[10px] text-[var(--accent)] mt-1 hover:underline">Copy</button>
+                        </div>
+                        <div class="inner-box">
+                            <div class="text-[10px] text-[var(--text-dim)] font-semibold uppercase tracking-wider mb-1" data-i18n="expiry">HẾT HẠN</div>
+                            <div id="home-expiry-display" class="font-orbitron font-bold text-[13px] text-[var(--text-main)]">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account & System Card (Moved to Home for overview) -->
+                <div class="neon-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-icon !bg-[rgba(123,97,255,0.15)] !text-[var(--accent)]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="card-title" data-i18n="app_manage">Device Info</h2>
+                                <p class="card-desc">Hardware & Session</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mt-2">
+                        <div class="inner-box flex flex-col justify-between">
+                            <div class="text-[10px] text-[var(--text-dim)] font-semibold uppercase tracking-wider mb-2" data-i18n="this_device">This Device</div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <svg class="w-5 h-5 text-[var(--accent)]" fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14V4zM5 22h14a2 2 0 002-2V8H3v12a2 2 0 002 2zM12 10l4 2-4 2v-4z"/></svg>
+                                <div id="manage-device-id" class="font-orbitron font-bold text-[12px] text-[var(--text-main)]">...</div>
+                            </div>
+                            <div id="manage-os" class="text-[10px] text-[var(--text-dim)]">...</div>
+                            <div id="manage-hwid" class="text-[9px] text-[var(--text-dim)] font-mono opacity-60 truncate">...</div>
+                        </div>
+                        
+                        <div class="inner-box flex flex-col justify-center cursor-pointer hover:bg-white/5 transition" onclick="showLogs()">
+                            <div class="flex items-center gap-2 mb-1">
+                                <svg class="w-4 h-4 text-[var(--accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <div class="font-bold text-[12px]">System Logs</div>
+                            </div>
+                            <div class="text-[10px] text-[var(--text-dim)] flex items-center justify-between">
+                                View Logs <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!-- END TAB HOME -->
+
+            <!-- TAB: FEATURES (Restored 5 functions here) -->
+            <div id="tab-features" class="tab-pane">
+                
+                <div class="neon-card">
+                    <div class="card-header">
+                        <div class="card-title-group">
+                            <div class="card-icon !bg-[rgba(255,0,255,0.15)] !text-[#FF00FF]">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                            </div>
+                            <div>
+                                <h2 class="card-title" data-i18n="app_features">Cheats Configuration</h2>
+                                <p class="card-desc">Manage all game modifications</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 1: ESP -->
+                    <div class="inner-box mb-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(123,97,255,0.15)] flex items-center justify-center text-[var(--accent)]">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-[14px] font-orbitron" data-i18n="f1_title">ESP</h3>
+                                        <span class="status-pill risk !py-0.5 !px-1.5 !text-[9px]">RISK</span>
+                                    </div>
+                                    <p class="text-[11px] text-[var(--text-dim)] mt-0.5" data-i18n="f1_desc">Highlight enemies on your screen.</p>
+                                </div>
+                            </div>
+                            <label class="switch !w-12 !h-7">
+                                <input type="checkbox" onchange="triggerFeatureDelay(this, 'ESP')">
+                                <span class="slider before:!h-5 before:!w-5 peer-checked:before:translate-x-5"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="text-[11px] text-[var(--text-main)] font-semibold mb-2 mt-4" data-i18n="f1_type">ESP Type</div>
+                        <div class="feature-grid" id="esp-grid">
+                            <button class="feat-btn active" onclick="triggerFeatureDelay(this, 'Kiểu MA', true)">MA</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu Mở', true)">MỞ</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu Bức Tường', true)">BỨC TƯỜNG</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu MOCO', true)">MOCO</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu CLU', true)">CLU</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu SHIROU', true)">SHIROU</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu HOA DIỆN VĨ', true)">HOA DIỆN</button>
+                            <button class="feat-btn" onclick="triggerFeatureDelay(this, 'Kiểu DREKI', true)">DREKI</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2: AIM TARGET -->
+                    <div class="inner-box mb-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(123,97,255,0.15)] flex items-center justify-center text-[var(--accent)]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><circle cx="12" cy="12" r="3"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v4m0 12v4M2 12h4m12 0h4"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[14px] font-orbitron" data-i18n="f2_title">AIM TARGET</h3>
+                                    <p class="text-[11px] text-[var(--text-dim)] mt-0.5" data-i18n="f2_desc">Move target from chest to head.</p>
+                                </div>
+                            </div>
+                            <label class="switch !w-12 !h-7">
+                                <input type="checkbox" onchange="triggerFeatureDelay(this, 'Aim Target')">
+                                <span class="slider before:!h-5 before:!w-5 peer-checked:before:translate-x-5"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mt-3">
+                            <!-- Visual indicator -->
+                            <div class="w-10 h-16 bg-white/5 rounded-t-full border border-white/10 relative flex flex-col items-center justify-between py-1 overflow-hidden">
+                                <div class="w-6 h-6 bg-red-900/60 rounded-t-full border border-red-500/50 absolute top-1"></div>
+                                <div class="text-[7px] text-gray-400 mt-auto z-10 font-bold">HEAD</div>
+                                <div class="text-[7px] text-gray-500 mb-1 z-10 font-bold">BODY</div>
+                            </div>
+                            <!-- Slider -->
+                            <div class="flex-1">
+                                <div class="flex justify-between text-[12px] font-bold mb-1">
+                                    <span class="text-[var(--text-dim)]">Height</span>
+                                    <span id="target-val" class="text-[var(--accent)] font-orbitron">68%</span>
+                                </div>
+                                <input type="range" min="0" max="100" value="68" id="target-slider" oninput="updateTargetSlider(this.value)" onchange="triggerFeatureDelay(this, 'Aim Target')" class="custom-slider">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3: Speed -->
+                    <div class="inner-box mb-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(123,97,255,0.15)] flex items-center justify-center text-[var(--accent)]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[14px] font-orbitron" data-i18n="f3_title">ATTACK SPEED</h3>
+                                    <p class="text-[11px] text-[var(--text-dim)] mt-0.5" data-i18n="f3_desc">Increase attack rate.</p>
+                                </div>
+                            </div>
+                            <label class="switch !w-12 !h-7">
+                                <input type="checkbox" onchange="triggerFeatureDelay(this, 'Speed')">
+                                <span class="slider before:!h-5 before:!w-5 peer-checked:before:translate-x-5"></span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-end mb-2 mt-4">
+                            <div class="text-[10px] text-[var(--text-dim)] font-bold font-orbitron" data-i18n="f3_speed">SPEED</div>
+                            <div class="font-orbitron font-black text-lg text-[var(--text-main)]"><span id="speed-val">1.5</span>x</div>
+                        </div>
+                        <input type="range" min="1" max="5" step="0.1" value="1.5" id="speed-slider" oninput="updateSpeedSlider(this.value)" onchange="triggerFeatureDelay(this, 'Speed')" class="custom-slider mb-2">
+                        <div class="grid grid-cols-4 gap-2 text-[10px] font-bold font-orbitron mt-2">
+                            <button onclick="setSpeed(1)" class="bg-white/5 border border-white/10 py-1.5 rounded-lg text-[var(--text-dim)]">1x</button>
+                            <button onclick="setSpeed(2)" class="bg-white/5 border border-white/10 py-1.5 rounded-lg text-[var(--text-dim)]">2x</button>
+                            <button onclick="setSpeed(3)" class="bg-white/5 border border-white/10 py-1.5 rounded-lg text-[var(--text-dim)]">3x</button>
+                            <button onclick="setSpeed(5)" id="btn-speed-5" class="bg-[var(--accent)] text-white py-1.5 rounded-lg shadow-[0_0_10px_var(--accent-glow)]">5x</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4: Gloo Wall -->
+                    <div class="inner-box mb-3">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(123,97,255,0.15)] flex items-center justify-center text-[var(--accent)]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[14px] font-orbitron" data-i18n="f4_title">GLOO WALL</h3>
+                                    <p class="text-[11px] text-[var(--text-dim)] mt-0.5">Adjust wall angle.</p>
+                                </div>
+                            </div>
+                            <label class="switch !w-12 !h-7">
+                                <input type="checkbox" onchange="triggerFeatureDelay(this, 'Gloo Wall')">
+                                <span class="slider before:!h-5 before:!w-5 peer-checked:before:translate-x-5"></span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-end mb-2 mt-4">
+                            <div class="text-[10px] text-[var(--text-dim)] font-bold font-orbitron" data-i18n="f4_angle">WALL ANGLE</div>
+                            <div class="font-orbitron font-black text-lg text-[var(--text-main)]"><span id="gloo-val">180</span>°</div>
+                        </div>
+                        <input type="range" min="-90" max="180" value="180" id="gloo-slider" oninput="updateGlooSlider(this.value)" onchange="triggerFeatureDelay(this, 'Gloo Wall')" class="custom-slider mb-2">
+                        <div class="grid grid-cols-4 gap-2 text-[10px] font-bold font-orbitron mt-2">
+                            <button onclick="setGloo(-90)" class="bg-white/5 border border-white/10 py-1.5 rounded-lg text-[var(--text-dim)]">-90°</button>
+                            <button onclick="setGloo(0)" class="bg-white/5 border border-white/10 py-1.5 rounded-lg text-[var(--text-dim)]">0°</button>
+                            <button onclick="setGloo(90)" class="bg-white/5 border border-white/10 py-1.5 rounded-lg text-[var(--text-dim)]">+90°</button>
+                            <button onclick="setGloo(180)" id="btn-gloo-180" class="bg-[var(--accent)] text-white py-1.5 rounded-lg shadow-[0_0_10px_var(--accent-glow)]">180°</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature 5: Fast Revive -->
+                    <div class="inner-box">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-[rgba(123,97,255,0.15)] flex items-center justify-center text-[var(--accent)]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-[14px] font-orbitron" data-i18n="f5_title">FAST RECOVERY</h3>
+                                    <p class="text-[11px] text-[var(--text-dim)] mt-0.5" data-i18n="f5_desc">Revive teammates in 0.1s instead of 3s.</p>
+                                </div>
+                            </div>
+                            <label class="switch !w-12 !h-7">
+                                <input type="checkbox" onchange="triggerFeatureDelay(this, 'Fast Recovery')">
+                                <span class="slider before:!h-5 before:!w-5 peer-checked:before:translate-x-5"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- TAB: ACCOUNT -->
+            <div id="tab-account" class="tab-pane">
+                <div class="neon-card">
+                    <h2 class="card-title mb-4">Account Settings</h2>
+                    
+                    <div class="inner-box mb-3">
+                         <div class="text-[10px] text-[var(--text-dim)] font-semibold uppercase tracking-wider mb-1" data-i18n="access_key">CHÌA KHÓA</div>
+                         <div id="account-key-display" class="font-orbitron font-bold text-[14px] text-[var(--text-main)]">HARDX-XXXX-XXXX-XXXX</div>
+                    </div>
+
+                    <button onclick="handleLogout()" class="w-full bg-red-500/10 text-red-500 font-bold py-3.5 rounded-xl border border-red-500/20 flex justify-center items-center space-x-2 hover:bg-red-500/20 transition">
+                        <span class="text-[14px]" data-i18n="logout">Đăng Xuất Khỏi OS</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB: SETTINGS -->
+            <div id="tab-settings" class="tab-pane space-y-4">
+                <!-- Themes -->
+                <div class="neon-card">
+                    <h2 class="card-title mb-3">Themes</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="changeTheme('default')" class="theme-btn p-2.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-white transition hover:bg-white/10">Default</button>
+                        <button onclick="changeTheme('premium')" class="theme-btn p-2.5 rounded-xl border border-[#D4AF37] bg-black/20 text-xs font-bold text-[#D4AF37] transition hover:bg-white/10">Premium</button>
+                        <button onclick="changeTheme('halloween')" class="theme-btn p-2.5 rounded-xl border border-[#FF8C00] bg-black/20 text-xs font-bold text-[#FF8C00] transition hover:bg-white/10">Halloween</button>
+                        <button onclick="changeTheme('christmas')" class="theme-btn p-2.5 rounded-xl border border-red-500 bg-black/20 text-xs font-bold text-red-500 transition hover:bg-white/10">Christmas</button>
+                        <button onclick="changeTheme('easter')" class="theme-btn p-2.5 rounded-xl border border-pink-400 bg-black/20 text-xs font-bold text-pink-400 transition hover:bg-white/10">Easter</button>
+                    </div>
+                </div>
+
+                <!-- Languages -->
+                <div class="neon-card">
+                    <h2 class="card-title mb-3">Language</h2>
+                    <div class="flex space-x-2">
+                        <button onclick="changeLanguage('vi')" class="lang-btn flex-1 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold hover:bg-white/10 text-white">VI</button>
+                        <button onclick="changeLanguage('en')" class="lang-btn flex-1 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold hover:bg-white/10 text-white">EN</button>
+                        <button onclick="changeLanguage('th')" class="lang-btn flex-1 py-2.5 rounded-xl border border-white/10 bg-white/5 text-xs font-bold hover:bg-white/10 text-white">TH</button>
+                    </div>
+                </div>
+
+                <!-- Music -->
+                <div class="neon-card">
+                    <h2 class="card-title mb-3">System Audio</h2>
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div id="music-disc" class="w-10 h-10 rounded-full border border-white/20 bg-black flex items-center justify-center relative disc-paused">
+                                <div class="w-3 h-3 bg-[var(--text-main)] rounded-full absolute z-10"></div>
+                            </div>
+                            <div>
+                                <div class="text-[13px] font-bold font-orbitron text-[var(--text-main)]">NoHardX Theme</div>
+                                <div class="text-[11px] text-[var(--text-dim)]">Lofi Beat</div>
+                            </div>
+                        </div>
+                        <button onclick="toggleMusic()" class="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center text-[var(--text-main)] hover:bg-white/20 transition">
+                            <svg id="icon-play" class="w-4 h-4 ml-0.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span id="music-current-time" class="text-[10px] text-[var(--text-dim)] font-mono w-8 text-right">0:00</span>
+                        <input type="range" id="music-progress" value="0" max="100" oninput="seekMusic(this.value)" class="custom-slider !my-0">
+                        <span id="music-duration" class="text-[10px] text-[var(--text-dim)] font-mono w-8">0:00</span>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION CONTAINER -->
+        <div id="bottom-nav-container">
+            <!-- Pull trigger -->
+            <div id="nav-trigger" onmousedown="startNavDrag(event)" ontouchstart="startNavDrag(event)">
+                <div id="nav-pill"></div>
+            </div>
+            
+            <!-- Nav Bar -->
+            <nav class="bottom-nav">
+                <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <span class="nav-label" data-i18n="app_home">Home</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('features')" id="nav-features">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <span class="nav-label" data-i18n="app_features">Features</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('account')" id="nav-account">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span class="nav-label" data-i18n="app_manage">Account</span>
+                </div>
+                <div class="nav-item" onclick="switchTab('settings')" id="nav-settings">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="nav-label" data-i18n="app_settings">Settings</span>
+                </div>
+            </nav>
+        </div>
+
+    </div> <!-- End OS Shell -->
+
+    <!-- SYSTEM LOGS MODAL -->
+    <div id="logs-modal" class="fixed inset-0 z-[99999] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-opacity">
+        <div class="bg-[#0a0a0a] border border-white/10 rounded-2xl w-full max-w-md overflow-hidden flex flex-col h-[60vh]">
+            <div class="flex justify-between items-center p-4 border-b border-white/10 bg-[#111]">
+                <h3 class="font-bold font-orbitron text-white">System Logs</h3>
+                <button onclick="closeLogs()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <div class="flex-1 p-4 overflow-y-auto">
+                <pre id="console-log" class="text-[11px] leading-relaxed text-[var(--success)] font-mono whitespace-pre-wrap">> NoHardX OS Booted...
+> Waiting for events...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- I18N ENGINE (LANGUAGE) ---
+        const translations = {
+            vi: {
+                os_name: "NOHARDX OS",
+                login_subtitle: "KHÔNG CẦN TÀI KHOẢN.<br>CHỈ CẦN CHÌA KHÓA CỦA BẠN.",
+                access_key: "KHÓA TRUY CẬP",
+                paste: "DÁN",
+                login_error: "MÃ KHÓA KHÔNG HỢP LỆ HOẶC ĐÃ HẾT HẠN",
+                login_btn: "ĐĂNG NHẬP OS",
+                app_home: "Connection Manager",
+                app_features: "Cheats",
+                app_manage: "Account",
+                app_settings: "Settings",
+                status_offline: "NGOẠI TUYẾN",
+                status_online: "ĐÃ KẾT NỐI",
+                status_connecting: "ĐANG KẾT NỐI...",
+                server_list: "DANH SÁCH MÁY CHỦ",
+                connect: "KẾT NỐI",
+                connected: "ĐÃ KẾT NỐI",
+                copy: "COPY",
+                copied: "ĐÃ LƯU!",
+                expiry: "HẾT HẠN",
+                device: "THIẾT BỊ",
+                unlocked: "CHƯA KHÓA",
+                f1_title: "DẤU HIỆU", f1_desc: "Đánh dấu mọi kẻ thù trên màn hình của bạn.", f1_type: "KIỂU ĐÁNH DẤU",
+                f2_title: "ĐIỂM MỤC TIÊU", f2_desc: "Di chuyển mục tiêu từ ngực lên đầu.", f2_height: "ĐỘ CAO",
+                f3_title: "TỐC ĐỘ ĐÁNH", f3_desc: "Tăng tốc độ ra đòn liên tục.", f3_speed: "TỐC ĐỘ",
+                f4_title: "XOAY GLOO", f4_angle: "GÓC TƯỜNG",
+                f5_title: "HỒI PHỤC NHANH", f5_desc: "Có thể hồi sinh đồng đội bị hạ gục trong khoảng 0,1 giây thay vì 3 giây.",
+                applying: "ĐANG ÁP DỤNG...",
+                this_device: "THIẾT BỊ NÀY",
+                community: "CỘNG ĐỒNG",
+                logout: "Đăng Xuất Khỏi OS",
+                theme_title: "Giao Diện (Theme)",
+                lang_title: "Ngôn Ngữ (Language)",
+                music_title: "Âm Thanh Hệ Thống",
+                update_title: "Cập Nhật Hệ Thống",
+                notif_success: "Thành Công",
+                notif_error: "Lỗi",
+                notif_warning: "Cảnh Báo",
+                notif_info: "Thông Báo",
+                notif_processing: "Đang Xử Lý"
+            },
+            en: {
+                os_name: "NOHARDX OS",
+                login_subtitle: "NO ACCOUNT NEEDED.<br>JUST YOUR ACCESS KEY.",
+                access_key: "ACCESS KEY",
+                paste: "PASTE",
+                login_error: "INVALID OR EXPIRED KEY",
+                login_btn: "LOGIN TO OS",
+                app_home: "Connection Manager",
+                app_features: "Cheats",
+                app_manage: "Account",
+                app_settings: "Settings",
+                status_offline: "OFFLINE",
+                status_online: "CONNECTED",
+                status_connecting: "CONNECTING...",
+                server_list: "SERVER LIST",
+                connect: "CONNECT",
+                connected: "CONNECTED",
+                copy: "COPY",
+                copied: "COPIED!",
+                expiry: "EXPIRY",
+                device: "DEVICE",
+                unlocked: "UNLOCKED",
+                f1_title: "ESP", f1_desc: "Highlight enemies on your screen.", f1_type: "ESP TYPE",
+                f2_title: "AIM TARGET", f2_desc: "Move target from chest to head.", f2_height: "HEIGHT",
+                f3_title: "ATTACK SPEED", f3_desc: "Increase attack rate.", f3_speed: "SPEED",
+                f4_title: "GLOO WALL", f4_angle: "WALL ANGLE",
+                f5_title: "FAST RECOVERY", f5_desc: "Revive teammates in 0.1s instead of 3s.",
+                applying: "APPLYING...",
+                this_device: "THIS DEVICE",
+                community: "COMMUNITY",
+                logout: "Logout from OS",
+                theme_title: "Theme",
+                lang_title: "Language",
+                music_title: "System Audio",
+                update_title: "System Update",
+                notif_success: "Success",
+                notif_error: "Error",
+                notif_warning: "Warning",
+                notif_info: "Info",
+                notif_processing: "Processing"
+            },
+            th: {
+                os_name: "NOHARDX OS",
+                login_subtitle: "ไม่ต้องมีบัญชี.<br>เพียงแค่คีย์ของคุณ",
+                access_key: "คีย์การเข้าถึง",
+                paste: "วาง",
+                login_error: "คีย์ไม่ถูกต้องหรือหมดอายุ",
+                login_btn: "เข้าสู่ระบบ OS",
+                app_home: "Connection Manager",
+                app_features: "Cheats",
+                app_manage: "Account",
+                app_settings: "Settings",
+                status_offline: "ออฟไลน์",
+                status_online: "เชื่อมต่อแล้ว",
+                status_connecting: "กำลังเชื่อมต่อ...",
+                server_list: "รายการเซิร์ฟเวอร์",
+                connect: "เชื่อมต่อ",
+                connected: "เชื่อมต่อแล้ว",
+                copy: "คัดลอก",
+                copied: "คัดลอกแล้ว!",
+                expiry: "หมดอายุ",
+                device: "อุปกรณ์",
+                unlocked: "ปลดล็อค",
+                f1_title: "ESP", f1_desc: "ไฮไลท์ศัตรูบนหน้าจอ", f1_type: "รูปแบบ ESP",
+                f2_title: "เป้าหมาย", f2_desc: "เลื่อนเป้าหมายจากอกขึ้นหัว", f2_height: "ความสูง",
+                f3_title: "ความเร็วโจมตี", f3_desc: "เพิ่มความเร็วในการโจมตี", f3_speed: "ความเร็ว",
+                f4_title: "ผนัง Gloo", f4_angle: "มุมผนัง",
+                f5_title: "ฟื้นฟูเร็ว", f5_desc: "ชุบชีวิตเพื่อนร่วมทีมใน 0.1 วินาที",
+                applying: "กำลังใช้งาน...",
+                this_device: "อุปกรณ์นี้",
+                community: "คอมมิวนิตี้",
+                logout: "ออกจากระบบ OS",
+                theme_title: "ธีม",
+                lang_title: "ภาษา",
+                music_title: "เสียงระบบ",
+                update_title: "อัปเดตระบบ",
+                notif_success: "สำเร็จ",
+                notif_error: "ข้อผิดพลาด",
+                notif_warning: "คำเตือน",
+                notif_info: "ข้อมูล",
+                notif_processing: "กำลังดำเนินการ"
+            }
+        };
+
+        let currentLang = localStorage.getItem('hx_lang') || 'vi';
+        let currentTheme = localStorage.getItem('hx_theme') || 'default';
+
+        function applyLanguage(lang) {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(translations[lang] && translations[lang][key]) {
+                    if(key === 'login_subtitle') {
+                        el.innerHTML = translations[lang][key];
+                    } else {
+                        el.innerText = translations[lang][key];
+                    }
+                }
+            });
+        }
+
+        function changeLanguage(lang) {
+            if (lang === currentLang) return;
+            localStorage.setItem('hx_lang', lang);
+            notifyOS('info', 'Language Changed', 'Applying new language...', 1000);
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        }
+
+        // --- THEME ENGINE ---
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('hx_theme', theme);
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('border-[var(--accent)]', 'bg-white/10');
+                btn.classList.add('border-white/10', 'bg-white/5');
+            });
+            const activeBtn = document.querySelector(`.theme-btn[onclick="changeTheme('${theme}')"]`);
+            if(activeBtn) {
+                activeBtn.classList.remove('border-white/10', 'bg-white/5');
+                activeBtn.classList.add('border-[var(--accent)]', 'bg-white/10');
+            }
+        }
+
+        function changeTheme(theme) {
+            currentTheme = theme;
+            applyTheme(theme);
+            notifyOS('success', 'Theme Changed', `Applied ${theme.toUpperCase()} theme.`);
+        }
+
+        // --- DYNAMIC ISLAND LOGIC ---
+        const island = document.getElementById('dynamic-island');
+        const islandTitle = document.getElementById('island-title');
+        const islandMessage = document.getElementById('island-message');
+        const islandFullIcon = document.getElementById('island-icon-full');
+        const progressContainer = document.getElementById('island-progress-container');
+        const progressBar = document.getElementById('island-progress-bar');
+
+        let islandQueue = [];
+        let isIslandShowing = false;
+        let islandTimeout = null;
+        let isExpanded = false;
+
+        const islandColors = {
+            success: { dot: 'dot-success', text: 'text-[var(--success)]' },
+            error: { dot: 'dot-error', text: 'text-[var(--danger)]' },
+            warning: { dot: 'dot-warning', text: 'text-[var(--warning)]' },
+            processing: { dot: 'dot-processing', text: 'text-[var(--accent)]' },
+            info: { dot: 'bg-white', text: 'text-white' }
+        };
+
+        function logToConsole(msg) {
+            const consoleEl = document.getElementById('console-log');
+            if(!consoleEl) return;
+            const time = new Date().toLocaleTimeString('vi-VN');
+            consoleEl.innerHTML += `\n> [${time}] ${msg}`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        function notifyOS(type, title, message, duration = 4000) {
+            islandQueue.push({ type, title, message, duration });
+            logToConsole(`[${type.toUpperCase()}] ${title}: ${message}`);
+            if (!isIslandShowing) processQueue();
+        }
+
+        function processQueue() {
+            if (islandQueue.length === 0) {
+                isIslandShowing = false;
+                island.classList.add('idle');
+                return;
+            }
+
+            isIslandShowing = true;
+            const data = islandQueue.shift();
+            const color = islandColors[data.type] || islandColors.info;
+
+            islandTitle.innerText = data.title;
+            islandTitle.className = `font-bold text-sm ${color.text}`;
+            islandMessage.innerText = data.message;
+            islandFullIcon.className = `status-dot ${color.dot}`;
+            
+            progressContainer.classList.add('hidden');
+            progressBar.style.width = '0%';
+
+            if (data.type === 'processing') {
+                progressContainer.classList.remove('hidden');
+                setTimeout(() => { progressBar.style.width = '100%'; }, 100);
+            }
+
+            isExpanded = false;
+            island.classList.remove('idle', 'expanded');
+            
+            clearTimeout(islandTimeout);
+            islandTimeout = setTimeout(() => {
+                if (!isExpanded) hideIsland();
+            }, data.duration);
+        }
+
+        function hideIsland() {
+            island.classList.remove('expanded');
+            setTimeout(() => {
+                if(!isExpanded) {
+                    island.classList.add('idle');
+                    setTimeout(processQueue, 400);
+                }
+            }, 200);
+        }
+
+        function toggleIslandExpand() {
+            if (island.classList.contains('idle') && islandQueue.length === 0) return;
+            
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                island.classList.remove('idle');
+                island.classList.add('expanded');
+                clearTimeout(islandTimeout);
+            } else {
+                island.classList.remove('expanded');
+                if (islandQueue.length > 0) {
+                     islandTimeout = setTimeout(() => hideIsland(), 2000);
+                } else {
+                     hideIsland();
+                }
+            }
+        }
+
+        // --- SYSTEM LOGIC ---
+        const VALID_KEYS = [
+            "HARDX-L6T-MJTG-84M", "HARDX-45J-WLMJ-TE7", "HARDX-240-6XH4-0YY", "HARDX-0TW-9COZ-3DZ", "HARDX-NS7-W1JJ-X87",
+            "HARDX-5SF-31FG-D1Q", "HARDX-TZR-Z1RB-PJZ", "HARDX-DOC-TUVF-TRZ", "HARDX-D6V-VJVI-H4H", "HARDX-U6O-EM1U-R4C",
+            "HARDX-K9E-KB4Y-9YY", "HARDX-9VI-2VDF-4C9", "HARDX-SXC-6A77-E6H", "HARDX-58G-GFS0-Y49", "HARDX-ZMM-XHXQ-2GI",
+            "HARDX-F5N-7551-1Y9", "HARDX-LMM-4VP9-17Y", "HARDX-HDB-9OLP-6IN", "HARDX-ETU-72UQ-T5J", "HARDX-Z25-C25X-WIB",
+            "HARDX-Z0T-T2OP-EIG", "HARDX-KBK-1HGF-0G8", "HARDX-JVL-0VNK-M4R", "HARDX-6AB-Z5XK-CXT", "HARDX-JSB-9PUV-KDZ",
+            "HARDX-FCZ-0G2O-CTD", "HARDX-DYB-68PV-YVA", "HARDX-W6U-6PB1-SAR", "HARDX-Y17-95YS-L3R", "HARDX-8ZB-DHC1-L72",
+            "HARDX-K5J-C5GF-P7K", "HARDX-LQH-6PG4-NN9", "HARDX-MI6-EUWR-MY2", "HARDX-76C-3WP9-U6R", "HARDX-UYO-DWFB-OFJ",
+            "HARDX-VWC-YYBS-CO2", "HARDX-9AZ-89UU-YE8", "HARDX-T1E-LHBC-2AW", "HARDX-GR4-ZIGD-JGC", "HARDX-RY3-S2DX-6WG",
+            "HARDX-NFH-058N-KCI", "HARDX-LIT-4E55-NA5", "HARDX-MKY-P7YV-ROZ", "HARDX-SIX-IQ2T-JWW", "HARDX-I5R-X9CO-CPJ",
+            "HARDX-24V-2CDF-W7U", "HARDX-ZTY-O2ZK-UFL", "HARDX-2T8-URYS-USY", "HARDX-UGE-PH53-87P", "HARDX-G06-G3VC-9UU"
+        ];
+        
+        const KEY_DURATION_MS = 30 * 24 * 60 * 60 * 1000; 
+        
+        const SERVERS = Array.from({length: 18}, (_, i) => {
+            const regions = ['VN', 'SG', 'TH', 'PH', 'ID'];
+            return {
+                id: i + 1,
+                name: `NOHARDX-${String(i + 1).padStart(2, '0')}`,
+                region: regions[Math.floor(Math.random() * regions.length)],
+                users: Math.floor(Math.random() * 800) + 200,
+                ping: Math.floor(Math.random() * 150) + 50
+            };
+        });
+
+        let currentKey = localStorage.getItem('hx_key');
+        let expiryTime = localStorage.getItem('hx_expiry');
+        
+        let isConnected = false;
+        let currentServerId = null;
+        let currentIp = "";
+        let isCooldown = false;
+        let connTimerInterval = null;
+        let connStartTime = null;
+
+        // Audio
+        const audio = document.getElementById('bg-music');
+        const iconPlay = document.getElementById('icon-play');
+        const iconPause = document.getElementById('icon-pause');
+        const musicDisc = document.getElementById('music-disc');
+        const musicProgress = document.getElementById('music-progress');
+
+        window.onload = () => {
+            applyTheme(currentTheme);
+            applyLanguage(currentLang);
+
+            setTimeout(() => {
+                document.getElementById('intro-screen').classList.add('hidden-intro');
+                document.getElementById('login-screen').classList.remove('hidden-intro');
+                
+                generateDeviceInfo();
+                
+                audio.volume = 0.5;
+                audio.addEventListener('timeupdate', updateMusicProgress);
+                audio.addEventListener('loadedmetadata', () => {
+                    document.getElementById('music-duration').innerText = formatTime(audio.duration);
+                });
+                updateMusicUI();
+
+                if (currentKey && expiryTime) {
+                    if (Date.now() > parseInt(expiryTime)) {
+                        handleLogout();
+                    } else {
+                        unlockOS();
+                    }
+                }
+            }, 2500);
+        };
+
+        // --- LOGIN LOGIC ---
+        function pasteKey() {
+            navigator.clipboard.readText().then(text => {
+                document.getElementById('login-key-input').value = text.trim().toUpperCase();
+            }).catch(err => {});
+        }
+
+        function handleLogin() {
+            const input = document.getElementById('login-key-input').value.trim().toUpperCase();
+            const errorMsg = document.getElementById('login-error');
+            
+            if (!input) { errorMsg.classList.remove('hidden'); return; }
+            errorMsg.classList.add('hidden');
+
+            const lockScreen = document.getElementById('login-screen');
+            lockScreen.style.opacity = '0.5';
+            
+            setTimeout(() => {
+                if (VALID_KEYS.includes(input)) {
+                    const now = Date.now();
+                    const expiry = now + KEY_DURATION_MS;
+                    
+                    localStorage.setItem('hx_key', input);
+                    localStorage.setItem('hx_expiry', expiry);
+                    
+                    if(!localStorage.getItem('hx_device_locked')) {
+                        localStorage.setItem('hx_device_locked', generateDeviceId());
+                    }
+                    
+                    currentKey = input;
+                    expiryTime = expiry;
+                    
+                    unlockOS();
+                    lockScreen.style.opacity = '1';
+                    notifyOS('success', translations[currentLang].notif_success, 'Welcome to NoHardX OS.');
+                } else {
+                    errorMsg.classList.remove('hidden');
+                    lockScreen.style.opacity = '1';
+                }
+            }, 800);
+        }
+
+        function unlockOS() {
+            const lockScreen = document.getElementById('login-screen');
+            lockScreen.classList.add('hidden-lock');
+            
+            const osShell = document.getElementById('os-shell');
+            osShell.classList.remove('hidden');
+            setTimeout(() => osShell.classList.add('active-os'), 50);
+            
+            // Setup UI data
+            document.getElementById('home-key-display').innerText = currentKey;
+            document.getElementById('account-key-display').innerText = currentKey;
+            const expDate = new Date(parseInt(expiryTime));
+            const formattedDate = `${expDate.getDate().toString().padStart(2, '0')}/${(expDate.getMonth()+1).toString().padStart(2, '0')}/${expDate.getFullYear()}`;
+            document.getElementById('home-expiry-display').innerText = formattedDate;
+            
+            generateDeviceInfo();
+            
+            // Default Tab
+            switchTab('home');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('hx_key');
+            localStorage.removeItem('hx_expiry');
+            currentKey = null;
+            expiryTime = null;
+            isConnected = false;
+            currentServerId = null;
+            isCooldown = false;
+            
+            clearInterval(connTimerInterval);
+            document.getElementById('conn-timer').classList.add('hidden');
+            
+            document.getElementById('os-shell').classList.add('hidden');
+            document.getElementById('os-shell').classList.remove('active-os');
+            
+            const lockScreen = document.getElementById('login-screen');
+            lockScreen.classList.remove('hidden-lock');
+            document.getElementById('login-key-input').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            
+            document.getElementById('connection-toggle').checked = false;
+            toggleConnection(false);
+            
+            notifyOS('info', translations[currentLang].notif_info, 'Logged out successfully.');
+        }
+
+        // --- TAB MANAGEMENT ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            if(targetTab) targetTab.classList.add('active');
+            
+            const navBtn = document.getElementById(`nav-${tabId}`);
+            if(navBtn) navBtn.classList.add('active');
+            
+            // Reset scroll
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        // --- NAV GESTURE LOGIC (HIDE/SHOW) ---
+        const navContainer = document.getElementById('bottom-nav-container');
+        const navTrigger = document.getElementById('nav-trigger');
+        let isDraggingNav = false;
+        let startY = 0;
+
+        function startNavDrag(e) {
+            isDraggingNav = true;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            document.addEventListener('mousemove', onNavDrag);
+            document.addEventListener('mouseup', stopNavDrag);
+            document.addEventListener('touchmove', onNavDrag, {passive: false});
+            document.addEventListener('touchend', stopNavDrag);
+        }
+
+        function onNavDrag(e) {
+            if (!isDraggingNav) return;
+            const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+            const deltaY = currentY - startY;
+
+            if (deltaY > 30 && !navContainer.classList.contains('hidden-nav')) {
+                hideNav();
+                isDraggingNav = false;
+            }
+            
+            if (deltaY < -30 && navContainer.classList.contains('hidden-nav')) {
+                showNav();
+                isDraggingNav = false;
+            }
+        }
+
+        function stopNavDrag() {
+            isDraggingNav = false;
+            document.removeEventListener('mousemove', onNavDrag);
+            document.removeEventListener('mouseup', stopNavDrag);
+            document.removeEventListener('touchmove', onNavDrag);
+            document.removeEventListener('touchend', stopNavDrag);
+        }
+
+        navTrigger.addEventListener('click', () => {
+            if (navContainer.classList.contains('hidden-nav')) {
+                showNav();
+            } else {
+                hideNav();
+            }
+        });
+
+        function hideNav() {
+            navContainer.classList.add('hidden-nav');
+            document.getElementById('main-content').style.paddingBottom = '20px';
+        }
+
+        function showNav() {
+            navContainer.classList.remove('hidden-nav');
+            document.getElementById('main-content').style.paddingBottom = '100px';
+        }
+
+        // Initial padding
+        document.getElementById('main-content').style.paddingBottom = '100px';
+
+        // --- MUSIC PLAYER ---
+        function updateMusicUI() {
+            if (audio.paused) {
+                iconPlay.classList.remove('hidden'); iconPause.classList.add('hidden');
+                musicDisc.classList.add('disc-paused'); musicDisc.classList.remove('disc-spinning');
+            } else {
+                iconPlay.classList.add('hidden'); iconPause.classList.remove('hidden');
+                musicDisc.classList.remove('disc-paused'); musicDisc.classList.add('disc-spinning');
+            }
+        }
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play().then(updateMusicUI).catch(e => console.log(e));
+                notifyOS('info', 'Audio', 'Playing theme music.');
+            } else {
+                audio.pause();
+                updateMusicUI();
+                notifyOS('info', 'Audio', 'Music paused.');
+            }
+        }
+
+        function changeVolume(val) { audio.volume = val; }
+        function seekMusic(val) { if(audio.duration) audio.currentTime = (val / 100) * audio.duration; }
+
+        function updateMusicProgress() {
+            if(audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                musicProgress.value = percent;
+                document.getElementById('music-current-time').innerText = formatTime(audio.currentTime);
+            }
+        }
+
+        function formatTime(sec) {
+            if(isNaN(sec)) return "0:00";
+            return `${Math.floor(sec/60)}:${Math.floor(sec%60).toString().padStart(2,'0')}`;
+        }
+
+        // --- CONNECTION LOGIC ---
+        function toggleConnection(checked) {
+            const serverPanel = document.getElementById('server-panel');
+            const statusText = document.getElementById('status-text');
+            const statusBadge = document.getElementById('conn-status-badge');
+            const statusBadgeText = document.getElementById('conn-status-text');
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusIp = document.getElementById('status-ip');
+            const connTimer = document.getElementById('conn-timer');
+
+            if (checked) {
+                serverPanel.classList.remove('hidden');
+                renderServers();
+                if(!isConnected) {
+                    statusText.innerText = translations[currentLang].status_offline;
+                    statusText.classList.add('!text-gray-400');
+                    statusIndicator.className = "w-3 h-3 bg-gray-500 rounded-full transition-colors duration-300 shadow-[0_0_10px_#555]";
+                    
+                    statusBadgeText.innerText = "Offline";
+                    statusBadge.className = "status-pill !bg-gray-500/20 !text-gray-400";
+                }
+            } else {
+                if(isConnected) {
+                    isConnected = false;
+                    currentServerId = null;
+                    clearInterval(connTimerInterval);
+                    connTimer.classList.add('hidden');
+                    statusIp.classList.add('hidden');
+                    
+                    statusText.innerText = translations[currentLang].status_offline;
+                    statusText.classList.add('!text-gray-400');
+                    statusIndicator.className = "w-3 h-3 bg-gray-500 rounded-full transition-colors duration-300 shadow-[0_0_10px_#555]";
+                    
+                    statusBadgeText.innerText = "Offline";
+                    statusBadge.className = "status-pill !bg-gray-500/20 !text-gray-400";
+                    
+                    notifyOS('warning', translations[currentLang].notif_warning, 'Disconnected from server.');
+                }
+                serverPanel.classList.add('hidden');
+            }
+        }
+
+        function renderServers() {
+            const list = document.querySelector('.server-list');
+            list.innerHTML = '';
+            
+            SERVERS.forEach(server => {
+                let pingColor = 'text-green-400';
+                if(server.ping > 100) pingColor = 'text-yellow-400';
+                if(server.ping > 150) pingColor = 'text-red-400';
+                
+                const isCurrent = currentServerId === server.id && isConnected;
+                const isButtonDisabled = isCooldown || (isConnected && !isCurrent);
+                
+                let btnText = translations[currentLang].connect;
+                let btnClass = 'bg-white/10 text-[var(--text-main)] hover:bg-white/20';
+                
+                if (isCurrent) {
+                    btnText = translations[currentLang].connected;
+                    btnClass = 'bg-[var(--accent)] text-white shadow-[0_0_10px_var(--accent-glow)]';
+                } else if (isCooldown) {
+                    btnText = 'WAIT...';
+                    btnClass = 'bg-gray-700 text-gray-400 cursor-not-allowed';
+                } else if (isConnected && !isCurrent) {
+                    btnText = 'SWITCH';
+                    btnClass = 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30';
+                }
+
+                const div = document.createElement('div');
+                div.className = `p-3 flex justify-between items-center rounded-xl border transition-all duration-300 ${isCurrent ? 'border-[var(--accent)] bg-[var(--accent)]/10' : 'border-white/5 bg-black/30'}`;
+                div.innerHTML = `
+                    <div class="flex flex-col">
+                        <div class="font-orbitron font-bold text-[13px] text-[var(--text-main)]">${server.name}</div>
+                        <div class="flex items-center space-x-2 text-[11px] text-[var(--text-dim)] mt-1">
+                            <span class="bg-white/10 px-1.5 py-0.5 rounded text-[var(--text-main)] text-[9px] font-bold">${server.region}</span>
+                            <span class="${pingColor} font-bold">${server.ping}ms</span>
+                        </div>
+                    </div>
+                    <button onclick="connectToServer(${server.id})" class="px-3 py-1.5 text-[11px] font-bold rounded-lg transition ${btnClass}" ${isButtonDisabled ? 'disabled' : ''}>
+                        ${btnText}
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function startConnectionTimer() {
+            const connTimer = document.getElementById('conn-timer');
+            connStartTime = Date.now();
+            connTimer.classList.remove('hidden');
+            
+            clearInterval(connTimerInterval);
+            connTimerInterval = setInterval(() => {
+                const diff = Math.floor((Date.now() - connStartTime) / 1000);
+                const m = String(Math.floor(diff / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                connTimer.innerText = `${m}:${s}`;
+            }, 1000);
+        }
+
+        function connectToServer(id) {
+            if(isCooldown) return;
+            if(isConnected && currentServerId === id) return;
+            
+            const loader = document.getElementById('conn-loading');
+            const statusText = document.getElementById('status-text');
+            const statusBadge = document.getElementById('conn-status-badge');
+            const statusBadgeText = document.getElementById('conn-status-text');
+            const statusIndicator = document.getElementById('status-indicator');
+            const statusIp = document.getElementById('status-ip');
+            
+            isCooldown = true;
+            setTimeout(() => { isCooldown = false; renderServers(); }, 4000);
+
+            loader.classList.remove('hidden');
+            statusText.innerText = translations[currentLang].status_connecting;
+            statusText.classList.remove('!text-gray-400');
+            statusText.classList.add('!text-yellow-400');
+            statusIndicator.className = "w-3 h-3 bg-yellow-400 rounded-full transition-colors duration-300 animate-pulse shadow-[0_0_10px_#facc15]";
+            
+            statusBadgeText.innerText = "Connecting...";
+            statusBadge.className = "status-pill !bg-yellow-500/20 !text-yellow-400";
+            
+            isConnected = false;
+            currentServerId = null;
+            renderServers();
+            
+            notifyOS('processing', translations[currentLang].notif_processing, `Connecting to Server 0${id}...`, 2000);
+
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                isConnected = true;
+                currentServerId = id;
+                
+                currentIp = `${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+                
+                statusText.innerText = translations[currentLang].status_online;
+                statusText.classList.remove('!text-yellow-400', '!text-gray-400');
+                statusText.classList.add('!text-[var(--accent)]');
+                statusIndicator.className = "w-3 h-3 bg-[var(--accent)] rounded-full transition-colors duration-300 shadow-[0_0_10px_var(--accent)]";
+                
+                statusBadgeText.innerText = "Online";
+                statusBadge.className = "status-pill online !bg-[rgba(123,97,255,0.15)] !text-[var(--accent)]";
+                
+                statusIp.innerText = `IP: ${currentIp}`;
+                statusIp.classList.remove('hidden');
+                
+                startConnectionTimer();
+                renderServers();
+                notifyOS('success', translations[currentLang].notif_success, `Connected to 0${id}. IP: ${currentIp}`);
+            }, 1500);
+        }
+
+        // --- FEATURES LOGIC ---
+        function triggerFeatureDelay(element, featureName, isButton = false) {
+            const overlay = document.getElementById('feature-global-loader');
+            if(overlay) {
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+            }
+            
+            const inputs = document.querySelectorAll('#tab-features input, #tab-features button');
+            inputs.forEach(el => el.style.pointerEvents = 'none');
+            
+            if (isButton) {
+                const buttons = element.parentElement.querySelectorAll('button');
+                buttons.forEach(btn => btn.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            notifyOS('processing', translations[currentLang].notif_processing, `Applying ${featureName}...`, 1500);
+
+            setTimeout(() => {
+                if(overlay) {
+                    overlay.classList.add('hidden');
+                    overlay.classList.remove('flex');
+                }
+                inputs.forEach(el => el.style.pointerEvents = 'auto');
+                
+                let statusText = 'Updated';
+                if (!isButton && element.type === 'checkbox') {
+                    statusText = element.checked ? 'Enabled' : 'Disabled';
+                }
+                notifyOS('success', translations[currentLang].notif_success, `${statusText} [${featureName}].`);
+            }, 1500);
+        }
+
+        function updateTargetSlider(val) {
+            document.getElementById('target-val').innerText = val + '%';
+        }
+
+        function updateSpeedSlider(val) {
+            document.getElementById('speed-val').innerText = parseFloat(val).toFixed(1);
+        }
+
+        function setSpeed(val) {
+            document.getElementById('speed-slider').value = val;
+            updateSpeedSlider(val);
+            triggerFeatureDelay(document.getElementById('speed-slider'), 'Speed');
+        }
+
+        function updateGlooSlider(val) {
+            document.getElementById('gloo-val').innerText = val;
+        }
+        
+        function setGloo(val) {
+            document.getElementById('gloo-slider').value = val;
+            updateGlooSlider(val);
+            triggerFeatureDelay(document.getElementById('gloo-slider'), 'Gloo Angle');
+        }
+
+        // --- LOGS MODAL ---
+        function showLogs() {
+            document.getElementById('logs-modal').classList.remove('hidden');
+            document.getElementById('logs-modal').classList.add('flex');
+        }
+        function closeLogs() {
+            document.getElementById('logs-modal').classList.add('hidden');
+            document.getElementById('logs-modal').classList.remove('flex');
+        }
+
+        // --- DEVICE MOCK ---
+        function generateDeviceId() { return 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase(); }
+        function generateDeviceInfo() {
+            let deviceId = localStorage.getItem('hx_device_locked') || '2311DRK48G';
+            const os = navigator.userAgent.includes("Android") ? "Android 14" : (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad") ? "iOS 17" : "Windows 11");
+            const hwid = Array.from({length: 16}, () => Math.floor(Math.random()*16).toString(16)).join('');
+            
+            document.getElementById('manage-device-id').innerText = deviceId;
+            document.getElementById('manage-os').innerText = os;
+            document.getElementById('manage-hwid').innerText = hwid;
+        }
+    </script>
+</body>
+</html>
